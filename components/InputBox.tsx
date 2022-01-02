@@ -54,8 +54,8 @@ export function InputBox({
   if (saveFunction)
     buttons.push(
       <Col key="save">
-        <Button type={saveButtonType} variant="success" block aria-label={ariaLabelSave} onClick={saveFunction} disabled={isSubmitting} >{saveText}</Button>
-      </Col >
+        <Button type={saveButtonType} variant="success" block aria-label={ariaLabelSave} onClick={saveFunction} disabled={isSubmitting}>{saveText}</Button>
+      </Col>
     );
 
   let classNames = ["inputBox"];
