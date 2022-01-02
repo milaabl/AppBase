@@ -60,7 +60,7 @@ export const SelectChurchSearch: React.FC<Props> = (props) => {
     <>
       <InputGroup>
         <FormControl id="searchText" aria-label="searchBox" name="searchText" type="text" placeholder="Name" value={searchText} onChange={handleChange} onKeyDown={handleKeyDown} />
-        <InputGroup.Append><Button id="searchButton" variant="primary" onClick={handleSubmit}>Search</Button></InputGroup.Append>
+        <Button id="searchButton" variant="primary" onClick={handleSubmit}>Search</Button>
       </InputGroup>
       {getResults()}
     </>

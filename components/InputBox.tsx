@@ -40,41 +40,22 @@ export function InputBox({
   if (cancelFunction)
     buttons.push(
       <Col key="cancel">
-        <Button variant="warning" block onClick={cancelFunction}>
-          Cancel
-        </Button>
+        <Button variant="warning" block onClick={cancelFunction}>Cancel</Button>
       </Col>
     );
 
   if (deleteFunction)
     buttons.push(
       <Col key="delete">
-        <Button
-          id="delete"
-          variant="danger"
-          block
-          aria-label={ariaLabelDelete}
-          onClick={deleteFunction}
-        >
-          Delete
-        </Button>
+        <Button id="delete" variant="danger" block aria-label={ariaLabelDelete} onClick={deleteFunction}>Delete</Button>
       </Col>
     );
 
   if (saveFunction)
     buttons.push(
       <Col key="save">
-        <Button
-          type={saveButtonType}
-          variant="success"
-          block
-          aria-label={ariaLabelSave}
-          onClick={saveFunction}
-          disabled={isSubmitting}
-        >
-          {saveText}
-        </Button>
-      </Col>
+        <Button type={saveButtonType} variant="success" block aria-label={ariaLabelSave} onClick={saveFunction} disabled={isSubmitting} >{saveText}</Button>
+      </Col >
     );
 
   let classNames = ["inputBox"];

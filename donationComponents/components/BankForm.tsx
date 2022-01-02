@@ -1,5 +1,6 @@
 import React from "react";
-import { Row, Col, FormControl } from "react-bootstrap";
+import { Row, Col, Form } from "react-bootstrap";
+
 import { useStripe } from "@stripe/react-stripe-js";
 import { InputBox, ErrorMessages } from "../../components";
 import { ApiHelper } from "../../helpers";
@@ -11,11 +12,11 @@ export const BankForm: React.FC<Props> = (props) => {
   const stripe = useStripe();
   const [bankAccount, setBankAccount] = React.useState<StripeBankAccountInterface>({ account_holder_name: props.bank.account_holder_name, account_holder_type: props.bank.account_holder_type, country: "US", currency: "usd" } as StripeBankAccountInterface);
   const [paymentMethod] = React.useState<PaymentMethodInterface>({ customerId: props.customerId, personId: props.person.id, email: props.person.contactInfo.email, name: props.person.name.display });
-  const [updateBankData] = React.useState<StripeBankAccountUpdateInterface>({ paymentMethodId: props.bank.id, customerId: props.customerId, personId: props.person.id, bankData: { account_holder_name: props.bank.account_holder_name, account_holder_type: props.bank.account_holder_type} } as StripeBankAccountUpdateInterface);
+  const [updateBankData] = React.useState<StripeBankAccountUpdateInterface>({ paymentMethodId: props.bank.id, customerId: props.customerId, personId: props.person.id, bankData: { account_holder_name: props.bank.account_holder_name, account_holder_type: props.bank.account_holder_type } } as StripeBankAccountUpdateInterface);
   const [verifyBankData, setVerifyBankData] = React.useState<StripeBankAccountVerifyInterface>({ paymentMethodId: props.bank.id, customerId: props.customerId, amountData: { amounts: [] } });
   const [showSave, setShowSave] = React.useState<boolean>(true);
   const [errorMessage, setErrorMessage] = React.useState<string>(null);
-  const saveDisabled = () => {}
+  const saveDisabled = () => { }
   const handleCancel = () => { props.setMode("display"); }
   const handleDelete = () => { props.deletePayment(); }
   const handleSave = () => {
@@ -102,14 +103,14 @@ export const BankForm: React.FC<Props> = (props) => {
 
   return (
     <InputBox headerIcon="fas fa-hand-holding-usd" headerText={getHeaderText()} ariaLabelSave="save-button" ariaLabelDelete="delete-button" cancelFunction={handleCancel} saveFunction={showSave ? handleSave : saveDisabled} deleteFunction={props.bank.id && !props.showVerifyForm ? handleDelete : undefined}>
-      { errorMessage && <ErrorMessages errors={[errorMessage]}></ErrorMessages> }
-      <form style={{margin: "10px"}}>
-        { !props.bank.id && <p>Bank accounts will need to be verified before making any donations. Your account will receive two small deposits in approximately 1-3 business days. You will need to enter those deposit amounts to finish verifying your account by selecting the verify account link next to your bank account under the payment methods section.</p> }
-        { props.showVerifyForm
+      {errorMessage && <ErrorMessages errors={[errorMessage]}></ErrorMessages>}
+      <form style={{ margin: "10px" }}>
+        {!props.bank.id && <p>Bank accounts will need to be verified before making any donations. Your account will receive two small deposits in approximately 1-3 business days. You will need to enter those deposit amounts to finish verifying your account by selecting the verify account link next to your bank account under the payment methods section.</p>}
+        {props.showVerifyForm
           ?
           <>
             <p>Enter the two deposits you received in your account to finish verifying your bank account.</p>
-            <Row style={{marginLeft: "10px", marginRight: "10px"}}>
+            <Row style={{ marginLeft: "10px", marginRight: "10px" }}>
               <Col>
                 <label>First Deposit</label>
                 <input type="text" name="amount1" aria-label="amount1" placeholder="00" className="form-control" maxLength={2} onChange={handleVerify} onKeyPress={handleKeyPress} />
@@ -122,29 +123,29 @@ export const BankForm: React.FC<Props> = (props) => {
           </>
           : <>
             <Row>
-              <Col xs="12" style={{marginBottom: "20px"}}>
+              <Col xs="12" style={{ marginBottom: "20px" }}>
                 <label>Account Holder Name</label>
                 <input type="text" name="account_holder_name" required aria-label="account-holder-name" placeholder="Account Holder Name" value={bankAccount.account_holder_name} className="form-control" onChange={handleChange} />
               </Col>
-              <Col xs="12" style={{marginBottom: "20px"}}>
+              <Col xs="12" style={{ marginBottom: "20px" }}>
                 <label>Account Holder Type</label>
-                <FormControl as="select" name="account_holder_type" aria-label="account-holder-type" value={bankAccount.account_holder_type} onChange={handleChange}>
+                <Form.Control as="select" name="account_holder_type" aria-label="account-holder-type" value={bankAccount.account_holder_type} onChange={handleChange}>
                   <option value="individual">Individual</option>
                   <option value="company">Company</option>
-                </FormControl>
+                </Form.Control>
               </Col>
             </Row>
-            { !props.bank.id
-                            && <Row>
-                              <Col xs="12" style={{marginBottom: "20px"}}>
-                                <label>Routing Number</label>
-                                <input type="number" name="routing_number" aria-label="routing-number" placeholder="Routing Number" className="form-control" onChange={handleChange} />
-                              </Col>
-                              <Col xs="12" style={{marginBottom: "20px"}}>
-                                <label>Account Number</label>
-                                <input type="number" name="account_number" aria-label="account-number" placeholder="Account Number" className="form-control" onChange={handleChange} />
-                              </Col>
-                            </Row>
+            {!props.bank.id
+              && <Row>
+                <Col xs="12" style={{ marginBottom: "20px" }}>
+                  <label>Routing Number</label>
+                  <input type="number" name="routing_number" aria-label="routing-number" placeholder="Routing Number" className="form-control" onChange={handleChange} />
+                </Col>
+                <Col xs="12" style={{ marginBottom: "20px" }}>
+                  <label>Account Number</label>
+                  <input type="number" name="account_number" aria-label="account-number" placeholder="Account Number" className="form-control" onChange={handleChange} />
+                </Col>
+              </Row>
             }
           </>
         }
