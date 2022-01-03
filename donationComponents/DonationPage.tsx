@@ -60,7 +60,7 @@ export const DonationPage: React.FC<Props> = (props) => {
       let d = donations[i];
       rows.push(
         <tr key={i}>
-          { appName !== "B1App" && <td><Link to={"/donations/" + d.batchId}>{d.batchId}</Link></td> }
+          {appName !== "B1App" && <td><Link to={"/donations/" + d.batchId}>{d.batchId}</Link></td>}
           <td>{DateHelper.prettyDate(new Date(d.donationDate))}</td>
           <td>{d.method} - {d.methodDetails}</td>
           <td>{d.fund.name}</td>
@@ -77,7 +77,7 @@ export const DonationPage: React.FC<Props> = (props) => {
     if (donations.length > 0) {
       rows.push(
         <tr key="header">
-          { appName !== "B1App" && <th>Batch</th> }
+          {appName !== "B1App" && <th>Batch</th>}
           <th>Date</th>
           <th>Method</th>
           <th>Fund</th>
@@ -89,7 +89,7 @@ export const DonationPage: React.FC<Props> = (props) => {
     return rows;
   }
 
-  React.useEffect(loadData, []);
+  React.useEffect(loadData, []); //eslint-disable-line
 
   const getTable = () => {
     if (!donations) return <Loading />;
@@ -115,7 +115,7 @@ export const DonationPage: React.FC<Props> = (props) => {
 
   return (
     <>
-      { paymentMethods && message && <Alert variant="success">{message}</Alert> }
+      {paymentMethods && message && <Alert variant="success">{message}</Alert>}
       {getPaymentMethodComponents()}
     </>
   );

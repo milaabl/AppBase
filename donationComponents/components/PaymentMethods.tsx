@@ -24,7 +24,7 @@ export const PaymentMethods: React.FC<Props> = (props) => {
   const handleDelete = async () => {
     let confirmed = window.confirm("Are you sure you want to delete this payment method?");
     if (confirmed) {
-      ApiHelper.delete("/paymentmethods/" + editPaymentMethod.id + "/" + props.customerId, "GivingApi").then(() =>{
+      ApiHelper.delete("/paymentmethods/" + editPaymentMethod.id + "/" + props.customerId, "GivingApi").then(() => {
         setMode("display");
         props.dataUpdate("Payment method deleted.");
       })
@@ -35,10 +35,10 @@ export const PaymentMethods: React.FC<Props> = (props) => {
     if (!UserHelper.checkAccess(Permissions.givingApi.settings.edit) && props.appName !== "B1App") return null;
     return (
       <>
-        <a id="addBtnGroup" aria-label="add-button" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="about:blank"><i className="fas fa-plus"></i></a>
+        <a id="addBtnGroup" aria-label="add-button" type="button" data-toggle="dropdown" aria-expanded="false" href="about:blank"><i className="fas fa-plus"></i></a>
         <div className="dropdown-menu" aria-labelledby="addBtnGroup">
-          <a className="dropdown-item" aria-label="add-card" href="about:blank" onClick={handleEdit(new StripePaymentMethod({type: "card"}))}><i className="fas fa-credit-card"></i> Add Card</a>
-          <a className="dropdown-item" aria-label="add-bank" href="about:blank" onClick={handleEdit(new StripePaymentMethod({type: "bank"}))}><i className="fas fa-university"></i> Add Bank</a>
+          <a className="dropdown-item" aria-label="add-card" href="about:blank" onClick={handleEdit(new StripePaymentMethod({ type: "card" }))}><i className="fas fa-credit-card"></i> Add Card</a>
+          <a className="dropdown-item" aria-label="add-bank" href="about:blank" onClick={handleEdit(new StripePaymentMethod({ type: "bank" }))}><i className="fas fa-university"></i> Add Bank</a>
         </div>
       </>
     );
@@ -49,11 +49,7 @@ export const PaymentMethods: React.FC<Props> = (props) => {
     return <a aria-label="edit-button" onClick={handleEdit(pm)} href="about:blank"><i className="fas fa-pencil-alt"></i></a>;
   }
 
-  const getPMIcon = (type: string) => {
-    return type === "card" ?
-    <i className="fas fa-credit-card"></i>
-    : <i className="fas fa-university"></i>
-  }
+  const getPMIcon = (type: string) => (type === "card" ? <i className="fas fa-credit-card"></i> : <i className="fas fa-university"></i>)
 
   const getPaymentRows = () => {
     let rows: JSX.Element[] = [];
@@ -62,7 +58,7 @@ export const PaymentMethods: React.FC<Props> = (props) => {
       rows.push(
         <tr key={method.id}>
           <td className="capitalize">{getPMIcon(method.type)} {method.name + " ****" + method.last4}</td>
-          <td>{method?.status === "new" && <a href="about:blank" aria-label="verify-account" onClick={handleEdit(method, true)}>Verify Account</a> }</td>
+          <td>{method?.status === "new" && <a href="about:blank" aria-label="verify-account" onClick={handleEdit(method, true)}>Verify Account</a>}</td>
           <td className="text-right">{getEditOptions(method)}</td>
         </tr>
       );
@@ -86,13 +82,13 @@ export const PaymentMethods: React.FC<Props> = (props) => {
 
   const EditForm = () => (
     <Elements stripe={props.stripePromise}>
-      { editPaymentMethod.type === "card" && <CardForm card={editPaymentMethod} customerId={props.customerId} person={props.person} setMode={setMode} deletePayment={handleDelete} updateList={(message) => { props.dataUpdate(message) }} /> }
-      { editPaymentMethod.type === "bank" && <BankForm bank={editPaymentMethod} showVerifyForm={verify} customerId={props.customerId} person={props.person} setMode={setMode} deletePayment={handleDelete} updateList={(message) => { props.dataUpdate(message) }} /> }
+      {editPaymentMethod.type === "card" && <CardForm card={editPaymentMethod} customerId={props.customerId} person={props.person} setMode={setMode} deletePayment={handleDelete} updateList={(message) => { props.dataUpdate(message) }} />}
+      {editPaymentMethod.type === "bank" && <BankForm bank={editPaymentMethod} showVerifyForm={verify} customerId={props.customerId} person={props.person} setMode={setMode} deletePayment={handleDelete} updateList={(message) => { props.dataUpdate(message) }} />}
     </Elements>
   )
 
   const PaymentMethods = () => {
-    if (mode === "display")  {
+    if (mode === "display") {
       return (
         <DisplayBox aria-label="payment-methods-box" headerIcon="fas fa-credit-card" headerText="Payment Methods" editContent={getNewContent()}>
           <PaymentMethodsTable></PaymentMethodsTable>

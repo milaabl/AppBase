@@ -101,54 +101,61 @@ export const BankForm: React.FC<Props> = (props) => {
     setVerifyBankData(verifyData);
   }
 
+  const getForm = () => {
+    if (props.showVerifyForm) {
+      return (<>
+        <p>Enter the two deposits you received in your account to finish verifying your bank account.</p>
+        <Row style={{ marginLeft: "10px", marginRight: "10px" }}>
+          <Col>
+            <label>First Deposit</label>
+            <input type="text" name="amount1" aria-label="amount1" placeholder="00" className="form-control" maxLength={2} onChange={handleVerify} onKeyPress={handleKeyPress} />
+          </Col>
+          <Col>
+            <label>Second Deposit</label>
+            <input type="text" name="amount2" aria-label="amount2" placeholder="00" className="form-control" maxLength={2} onChange={handleVerify} onKeyPress={handleKeyPress} />
+          </Col>
+        </Row>
+      </>);
+
+    } else {
+      let accountDetails = <></>
+      if (props.bank.id) accountDetails = (
+        <Row>
+          <Col xs="12" style={{ marginBottom: "20px" }}>
+            <label>Routing Number</label>
+            <input type="number" name="routing_number" aria-label="routing-number" placeholder="Routing Number" className="form-control" onChange={handleChange} />
+          </Col>
+          <Col xs="12" style={{ marginBottom: "20px" }}>
+            <label>Account Number</label>
+            <input type="number" name="account_number" aria-label="account-number" placeholder="Account Number" className="form-control" onChange={handleChange} />
+          </Col>
+        </Row>
+      );
+      return (<>
+        <Row>
+          <Col xs="12" style={{ marginBottom: "20px" }}>
+            <label>Account Holder Name</label>
+            <input type="text" name="account_holder_name" required aria-label="account-holder-name" placeholder="Account Holder Name" value={bankAccount.account_holder_name} className="form-control" onChange={handleChange} />
+          </Col>
+          <Col xs="12" style={{ marginBottom: "20px" }}>
+            <label>Account Holder Type</label>
+            <Form.Control as="select" name="account_holder_type" aria-label="account-holder-type" value={bankAccount.account_holder_type} onChange={handleChange}>
+              <option value="individual">Individual</option>
+              <option value="company">Company</option>
+            </Form.Control>
+          </Col>
+        </Row>
+        {accountDetails}
+      </>);
+    }
+  }
+
   return (
     <InputBox headerIcon="fas fa-hand-holding-usd" headerText={getHeaderText()} ariaLabelSave="save-button" ariaLabelDelete="delete-button" cancelFunction={handleCancel} saveFunction={showSave ? handleSave : saveDisabled} deleteFunction={props.bank.id && !props.showVerifyForm ? handleDelete : undefined}>
       {errorMessage && <ErrorMessages errors={[errorMessage]}></ErrorMessages>}
       <form style={{ margin: "10px" }}>
         {!props.bank.id && <p>Bank accounts will need to be verified before making any donations. Your account will receive two small deposits in approximately 1-3 business days. You will need to enter those deposit amounts to finish verifying your account by selecting the verify account link next to your bank account under the payment methods section.</p>}
-        {props.showVerifyForm
-          ?
-          <>
-            <p>Enter the two deposits you received in your account to finish verifying your bank account.</p>
-            <Row style={{ marginLeft: "10px", marginRight: "10px" }}>
-              <Col>
-                <label>First Deposit</label>
-                <input type="text" name="amount1" aria-label="amount1" placeholder="00" className="form-control" maxLength={2} onChange={handleVerify} onKeyPress={handleKeyPress} />
-              </Col>
-              <Col>
-                <label>Second Deposit</label>
-                <input type="text" name="amount2" aria-label="amount2" placeholder="00" className="form-control" maxLength={2} onChange={handleVerify} onKeyPress={handleKeyPress} />
-              </Col>
-            </Row>
-          </>
-          : <>
-            <Row>
-              <Col xs="12" style={{ marginBottom: "20px" }}>
-                <label>Account Holder Name</label>
-                <input type="text" name="account_holder_name" required aria-label="account-holder-name" placeholder="Account Holder Name" value={bankAccount.account_holder_name} className="form-control" onChange={handleChange} />
-              </Col>
-              <Col xs="12" style={{ marginBottom: "20px" }}>
-                <label>Account Holder Type</label>
-                <Form.Control as="select" name="account_holder_type" aria-label="account-holder-type" value={bankAccount.account_holder_type} onChange={handleChange}>
-                  <option value="individual">Individual</option>
-                  <option value="company">Company</option>
-                </Form.Control>
-              </Col>
-            </Row>
-            {!props.bank.id
-              && <Row>
-                <Col xs="12" style={{ marginBottom: "20px" }}>
-                  <label>Routing Number</label>
-                  <input type="number" name="routing_number" aria-label="routing-number" placeholder="Routing Number" className="form-control" onChange={handleChange} />
-                </Col>
-                <Col xs="12" style={{ marginBottom: "20px" }}>
-                  <label>Account Number</label>
-                  <input type="number" name="account_number" aria-label="account-number" placeholder="Account Number" className="form-control" onChange={handleChange} />
-                </Col>
-              </Row>
-            }
-          </>
-        }
+        {getForm()}
       </form>
     </InputBox>
   );
