@@ -4,8 +4,6 @@ import { ReportHeadingInterface } from "../interfaces/ReportInterfaces";
 export class ReportHelper {
 
   static getRows(data: any, headings: ReportHeadingInterface[], groupings: string[]) {
-    console.log("DATA");
-    console.log(data);
     if (groupings.length < 2) return this.getSingleGroupingRows(data, headings, groupings);
     else return this.getMultiGroupingRows(data, headings, groupings);
   }

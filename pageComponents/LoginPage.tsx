@@ -125,8 +125,6 @@ export const LoginPage: React.FC<Props> = (props) => {
     if (returnUrl) {
       setRedirectTo(returnUrl);
     }
-    console.log("Loginsuccess")
-    console.log(props.loginSuccessOverride);
 
     if (props.loginSuccessOverride !== undefined) props.loginSuccessOverride();
     else props.context.setUserName(UserHelper.currentChurch.id.toString());

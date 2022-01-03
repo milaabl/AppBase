@@ -59,7 +59,6 @@ export class AppearanceHelper {
   private static getHexValue(hex: string) {
     let result = parseInt(hex, 16);
     if (hex.length === 1) result = result * 16;
-    console.log("HEX: " + hex + " = " + result.toString())
     return result;
   }
 
