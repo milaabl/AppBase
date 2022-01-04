@@ -1,14 +1,16 @@
 import React, { useRef } from "react";
 import { Row, Col, FormGroup, Form, InputGroup } from "react-bootstrap"
 import { ApiHelper } from "../../helpers"
-import { ChurchInterface } from "../../interfaces";
+import { ChurchInterface, RegisterChurchRequestInterface } from "../../interfaces";
 import * as yup from "yup"
 import { Formik, FormikHelpers } from "formik"
 import { InputBox } from "../../components"
 
 interface Props {
-  registeredChurchCallback?: (church: ChurchInterface) => void
-  selectChurch: (churchId: string) => void
+  initialChurchName: string,
+  registeredChurchCallback?: (church: ChurchInterface) => void,
+  selectChurch: (churchId: string) => void,
+  appName: string
 }
 
 const schema = yup.object().shape({
@@ -22,12 +24,10 @@ const schema = yup.object().shape({
 })
 
 export const SelectChurchRegister: React.FC<Props> = (props) => {
-
   const formikRef: any = useRef(null);
+  const initialValues: RegisterChurchRequestInterface = { name: props.initialChurchName, address1: "", address2: "", city: "", state: "", zip: "", country: "", subDomain: props.initialChurchName.toLowerCase().replace(" ", ""), appName: props.appName }
 
-  const initialValues: ChurchInterface = { name: "", address1: "", address2: "", city: "", state: "", zip: "", country: "", subDomain: "" }
-
-  const handleSave = (church: ChurchInterface, { setSubmitting }: FormikHelpers<ChurchInterface>) => {
+  const handleSave = (church: RegisterChurchRequestInterface, { setSubmitting }: FormikHelpers<RegisterChurchRequestInterface>) => {
     setSubmitting(true);
     ApiHelper.post("/churches/add", church, "AccessApi").then(async resp => {
       setSubmitting(false);

@@ -260,7 +260,7 @@ export const LoginPage: React.FC<Props> = (props) => {
       {getWelcomeBack()}
       {getCheckEmail()}
       {getLoginRegister()}
-      <SelectChurchModal show={showSelectModal} churches={loginResponse?.churches} selectChurch={selectChurch} registeredChurchCallback={handleChurchRegistered} errors={errors} />
+      <SelectChurchModal show={showSelectModal} churches={loginResponse?.churches} selectChurch={selectChurch} registeredChurchCallback={handleChurchRegistered} errors={errors} appName={props.appName} />
     </div>
   );
 
