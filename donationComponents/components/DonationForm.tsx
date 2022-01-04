@@ -41,7 +41,7 @@ export const DonationForm: React.FC<Props> = (props) => {
   const loadData = () => {
     ApiHelper.get("/funds", "GivingApi").then(data => {
       setFunds(data);
-      if (data.length) setFundDonations([{fundId: data[0].id}]);
+      if (data.length) setFundDonations([{ fundId: data[0].id }]);
     });
   }
 
@@ -106,7 +106,7 @@ export const DonationForm: React.FC<Props> = (props) => {
     for (const fundDonation of fd) {
       totalAmount += fundDonation.amount || 0;
       let fund = funds.find((fund: FundInterface) => fund.id === fundDonation.fundId);
-      selectedFunds.push({id: fundDonation.fundId, amount: fundDonation.amount || 0, name: fund.name});
+      selectedFunds.push({ id: fundDonation.fundId, amount: fundDonation.amount || 0, name: fund.name });
     }
     let d = { ...donation };
     d.amount = totalAmount;
@@ -132,14 +132,14 @@ export const DonationForm: React.FC<Props> = (props) => {
       <InputBox id="donationBox" aria-label="donation-box" headerIcon="fas fa-hand-holding-usd" headerText="Donate" ariaLabelSave="save-button" cancelFunction={donationType ? handleCancel : undefined} saveFunction={donationType ? handleSave : undefined} saveText="Preview Donation">
         <Row>
           <Col>
-            <Button aria-label="single-donation" size="sm" block style={{minHeight: "50px"}} variant={donationType === "once" ? "primary" : "light"} onClick={() => handleDonationSelect("once")}>Make a Donation</Button>
+            <Button aria-label="single-donation" size="sm" block style={{ minHeight: "50px" }} variant={donationType === "once" ? "primary" : "light"} onClick={() => handleDonationSelect("once")}>Make a Donation</Button>
           </Col>
           <Col>
-            <Button aria-label="recurring-donation" size="sm" block style={{minHeight: "50px"}} variant={donationType === "recurring" ? "primary" : "light"} onClick={() => handleDonationSelect("recurring")}>Make a Recurring Donation</Button>
+            <Button aria-label="recurring-donation" size="sm" block style={{ minHeight: "50px" }} variant={donationType === "recurring" ? "primary" : "light"} onClick={() => handleDonationSelect("recurring")}>Make a Recurring Donation</Button>
           </Col>
         </Row>
-        { donationType
-          && <div style={{marginTop: "20px"}}>
+        {donationType
+          && <div style={{ marginTop: "20px" }}>
             <FormGroup>
               <FormLabel>Method</FormLabel>
               <FormControl as="select" name="method" aria-label="method" value={donation.id} className="capitalize" onChange={handleChange}>
@@ -172,14 +172,14 @@ export const DonationForm: React.FC<Props> = (props) => {
               </Row>
             }
             <div className="form-group">
-              { funds && fundDonations
+              {funds && fundDonations
                 && <FormGroup>
                   <FormLabel>Fund</FormLabel>
                   <FundDonations fundDonations={fundDonations} funds={funds} updatedFunction={handleFundDonationsChange} />
                 </FormGroup>
               }
-              { fundsTotal > 0 &&
-                <>
+              {fundsTotal > 0
+                && <>
                   <FormGroup controlId="formBasicCheckbox">
                     <FormCheck
                       type="checkbox"

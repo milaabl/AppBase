@@ -41,7 +41,7 @@ export const RecurringDonations: React.FC<Props> = (props) => {
 
   const getPaymentMethod = (sub: SubscriptionInterface) => {
     const pm = props.paymentMethods.find((pm: any) => pm.id === (sub.default_payment_method || sub.default_source));
-    if (!pm) return <span style={{color: "red"}}>Payment method not found.</span>;
+    if (!pm) return <span style={{ color: "red" }}>Payment method not found.</span>;
     return `${pm.name} ****${pm.last4}`;
   }
 
@@ -55,14 +55,14 @@ export const RecurringDonations: React.FC<Props> = (props) => {
     subscription.funds.forEach((fund: any) => {
       result.push(
         <div key={subscription.id + fund.id}>
-          {fund.name} <span style={{float: "right"}}>{CurrencyHelper.formatCurrency(fund.amount)}</span>
+          {fund.name} <span style={{ float: "right" }}>{CurrencyHelper.formatCurrency(fund.amount)}</span>
         </div>
       );
     });
     const total = (subscription.plan.amount / 100);
     result.push(
-      <div key={subscription.id + "-total"} style={{borderTop: "solid #dee2e6 1px"}}>
-        Total <span style={{float: "right"}}>{CurrencyHelper.formatCurrency(total)}</span>
+      <div key={subscription.id + "-total"} style={{ borderTop: "solid #dee2e6 1px" }}>
+        Total <span style={{ float: "right" }}>{CurrencyHelper.formatCurrency(total)}</span>
       </div>
     );
     return result;
@@ -103,7 +103,7 @@ export const RecurringDonations: React.FC<Props> = (props) => {
     </Table>
   )
 
-  React.useEffect(loadData, []);
+  React.useEffect(loadData, []); //eslint-disable-line
 
   if (!subscriptions.length) return null;
   if (mode === "display") {
