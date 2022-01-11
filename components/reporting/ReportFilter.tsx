@@ -24,8 +24,8 @@ export const ReportFilter = (props: Props) => {
 
   const getOptions = (data: ReportFilterOptionInterface[]) => {
     let result: JSX.Element[] = [];
-        data?.forEach((d, index) => { result.push(<option key={index} value={d.value}>{d.label}</option>) });
-        return result;
+    data?.forEach((d, index) => { result.push(<option key={index} value={d.value}>{d.label}</option>) });
+    return result;
   }
 
   const getControl = (field: ReportFilterFieldInterface) => {
