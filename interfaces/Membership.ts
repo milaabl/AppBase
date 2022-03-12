@@ -13,7 +13,7 @@ export interface NoteInterface { id?: string, churchId?: string, contentType?: s
 export interface ReportInterface { id?: string, keyName?: string, title?: string, query?: string, parameters?: string, reportType: string, columns?: ReportColumnInterface[], values?: ReportValueInterface[], results?: any[] }
 export interface ReportColumnInterface { field?: string, heading?: string, grouped?: boolean, formatType?: string }
 export interface ReportValueInterface { key?: string, value?: any }
-export interface PersonInterface { id?: string, name: NameInterface, contactInfo: ContactInfoInterface, membershipStatus?: string, gender?: string, birthDate?: Date, maritalStatus?: string, anniversary?: Date, photo?: string, photoUpdated?: Date, householdId?: string, householdRole?: string, userId?: string, formSubmissions?: [FormSubmissionInterface] }
+export interface PersonInterface { id?: string, name: NameInterface, contactInfo: ContactInfoInterface, membershipStatus?: string, gender?: string, birthDate?: Date, maritalStatus?: string, anniversary?: Date, photo?: string, photoUpdated?: Date, householdId?: string, householdRole?: string, userId?: string, school?: string, grade?: string, graduationDate?: string, employer?: string, formSubmissions?: [FormSubmissionInterface] }
 export interface QuestionInterface { id?: string, formId?: string, title?: string, fieldType?: string, placeholder?: string, description?: string, required?: boolean, choices?: [{ value?: string, text?: string }] }
 export interface ServiceInterface { id?: string, campusId?: string, name?: string, campus?: CampusInterface }
 export interface ServiceTimeInterface { id?: string, name?: string, longName?: string, serviceId?: string, groups?: GroupInterface[] }

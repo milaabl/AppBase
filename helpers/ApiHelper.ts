@@ -57,12 +57,17 @@ export class ApiHelper {
 
   static async post(path: string, data: any[] | {}, apiName: ApiListType) {
     const config = this.getConfig(apiName);
-    const requestOptions = {
-      method: "POST",
-      headers: { Authorization: "Bearer " + config.jwt, "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    };
-    return fetch(config.url + path, requestOptions).then(response => response.json())
+    try {
+      const requestOptions = {
+        method: "POST",
+        headers: { Authorization: "Bearer " + config.jwt, "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      };
+      return fetch(config.url + path, requestOptions).then(response => response.json())
+    } catch (e) {
+      console.log(e);
+      return e
+    }
   }
 
   static async delete(path: string, apiName: ApiListType) {

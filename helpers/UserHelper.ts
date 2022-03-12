@@ -17,7 +17,6 @@ export class UserHelper {
     }
     else if (keyName) UserHelper.churches.forEach(c => { if (c.subDomain === keyName) church = c; });
     else church = UserHelper.churches[0];
-
     if (!church) return;
     else {
       UserHelper.currentChurch = church;
