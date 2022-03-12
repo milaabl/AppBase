@@ -37,36 +37,52 @@ export class ApiHelper {
 
   static async get(path: string, apiName: ApiListType) {
     const config = this.getConfig(apiName);
+    const requestOptions = { method: "GET", headers: { Authorization: "Bearer " + config.jwt } };
     try {
-      const requestOptions = { method: "GET", headers: { Authorization: "Bearer " + config.jwt } };
-      return fetch(config.url + path, requestOptions).then(response => response.json())
+      const response = await fetch(config.url + path, requestOptions);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
     } catch (e) {
+      console.log(e)
       throw (e);
     }
   }
 
   static async getAnonymous(path: string, apiName: ApiListType) {
     const config = this.getConfig(apiName);
+    const requestOptions = { method: "GET" };
+
     try {
-      const requestOptions = { method: "GET" };
-      return fetch(config.url + path, requestOptions).then(response => response.json())
+      const response = await fetch(config.url + path, requestOptions);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
     } catch (e) {
+      console.log(e)
       throw (e);
     }
   }
 
   static async post(path: string, data: any[] | {}, apiName: ApiListType) {
     const config = this.getConfig(apiName);
+
+    const requestOptions = {
+      method: "POST",
+      headers: { Authorization: "Bearer " + config.jwt, "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    };
     try {
-      const requestOptions = {
-        method: "POST",
-        headers: { Authorization: "Bearer " + config.jwt, "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      };
-      return fetch(config.url + path, requestOptions).then(response => response.json())
+      const response = await fetch(config.url + path, requestOptions);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
     } catch (e) {
-      console.log(e);
-      return e
+      console.log(e)
+      throw (e);
     }
   }
 
@@ -76,7 +92,16 @@ export class ApiHelper {
       method: "DELETE",
       headers: { Authorization: "Bearer " + config.jwt }
     };
-    return fetch(config.url + path, requestOptions);
+    try {
+      const response = await fetch(config.url + path, requestOptions);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    } catch (e) {
+      console.log(e)
+      throw (e);
+    }
   }
 
   static async postAnonymous(path: string, data: any[] | {}, apiName: ApiListType) {
@@ -86,7 +111,16 @@ export class ApiHelper {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     };
-    return fetch(config.url + path, requestOptions).then(response => response.json())
+    try {
+      const response = await fetch(config.url + path, requestOptions);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    } catch (e) {
+      console.log(e)
+      throw (e);
+    }
   }
 
 }

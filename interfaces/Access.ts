@@ -15,5 +15,5 @@ export interface GenericSettingInterface { id?: string, churchId?: string, keyNa
 export interface UserChurchInterface { id?: string, userId?: string, churchId?: string, personId?: string }
 
 export interface ApiConfig { keyName: string, url: string, jwt: string, permisssions: RolePermissionInterface[] }
-export type ApiListType = "AccessApi" | "MembershipApi" | "AttendanceApi" | "GivingApi" | "MessagingApi" | "StreamingLiveApi" | "B1Api" | "LessonsApi";
+export type ApiListType = "AccessApi" | "MembershipApi" | "AttendanceApi" | "GivingApi" | "MessagingApi" | "StreamingLiveApi" | "B1Api" | "LessonsApi" | "ReportingApi";
 export interface IPermission { api: string, contentType: string, action: string }
