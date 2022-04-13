@@ -153,14 +153,12 @@ export const LoginPage: React.FC<Props> = (props) => {
       if (!ArrayHelper.getOne(UserHelper.churches, "id", churchId)) {
         const church: ChurchInterface = await ApiHelper.post("/churches/select", { churchId: churchId }, "AccessApi");
         UserHelper.setupApiHelper(church);
-  
         //create/claim the person record and relogin
         const personClaim = await ApiHelper.get("/people/claim/" + churchId, "MembershipApi");
         await ApiHelper.post("/userChurch/claim", { encodedPerson: personClaim.encodedPerson }, "AccessApi");
         login({ jwt: userJwt || userJwtBackup }, undefined);
         return;
       }
-  
       UserHelper.selectChurch(props.context, churchId, null).then(() => {
         continuedLoginProcess()
       });
