@@ -10,6 +10,8 @@ import { createPortal } from "react-dom";
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from "@lexical/rich-text";
 import { $isCodeNode, getDefaultCodeLanguage, getCodeLanguages } from "@lexical/code";
 import { Icon } from "@mui/material";
+import FloatingLinkEditor from "./customLink/FloatingLinkEditor";
+import { TOGGLE_CUSTOM_LINK_NODE_COMMAND, $isCustomLinkNode } from "./customLink/CustomLinkNode";
 
 const LowPriority = 1;
 
@@ -44,145 +46,6 @@ function positionEditorElement(editor: any, rect: any) {
   }
 }
 
-function FloatingLinkEditor({ editor }: { editor: any }) {
-  const editorRef = useRef(null);
-  const inputRef = useRef(null);
-  const mouseDownRef = useRef(false);
-  const [linkUrl, setLinkUrl] = useState("");
-  const [isEditMode, setEditMode] = useState(false);
-  const [lastSelection, setLastSelection] = useState(null);
-
-  const updateLinkEditor = useCallback(() => {
-    const selection = $getSelection();
-    if ($isRangeSelection(selection)) {
-      const node = getSelectedNode(selection);
-      const parent = node.getParent();
-      if ($isLinkNode(parent)) {
-        setLinkUrl(parent.getURL());
-      } else if ($isLinkNode(node)) {
-        setLinkUrl(node.getURL());
-      } else {
-        setLinkUrl("");
-      }
-    }
-    const editorElem = editorRef.current;
-    const nativeSelection = window.getSelection();
-    const activeElement = document.activeElement;
-
-    if (editorElem === null) {
-      return;
-    }
-
-    const rootElement = editor.getRootElement();
-    if (
-      selection !== null
-      && !nativeSelection.isCollapsed
-      && rootElement !== null
-      && rootElement.contains(nativeSelection.anchorNode)
-    ) {
-      const domRange = nativeSelection.getRangeAt(0);
-      let rect;
-      if (nativeSelection.anchorNode === rootElement) {
-        let inner = rootElement;
-        while (inner.firstElementChild != null) {
-          inner = inner.firstElementChild;
-        }
-        rect = inner.getBoundingClientRect();
-      } else {
-        rect = domRange.getBoundingClientRect();
-      }
-
-      if (!mouseDownRef.current) {
-        positionEditorElement(editorElem, rect);
-      }
-      setLastSelection(selection);
-    } else if (!activeElement || activeElement.className !== "link-input") {
-      positionEditorElement(editorElem, null);
-      setLastSelection(null);
-      setEditMode(false);
-      setLinkUrl("");
-    }
-
-    return true;
-  }, [editor]);
-
-  useEffect(() =>
-    mergeRegister(
-      editor.registerUpdateListener(({ editorState }: { editorState: any }) => {
-        editorState.read(() => {
-          updateLinkEditor();
-        });
-      }),
-
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        () => {
-          updateLinkEditor();
-          return true;
-        },
-        LowPriority
-      )
-    ), [editor, updateLinkEditor]);
-
-  useEffect(() => {
-    editor.getEditorState().read(() => {
-      updateLinkEditor();
-    });
-  }, [editor, updateLinkEditor]);
-
-  useEffect(() => {
-    if (isEditMode && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isEditMode]);
-
-  return (
-    <div ref={editorRef} className="link-editor">
-      {isEditMode
-        ? (<input
-          ref={inputRef}
-          className="link-input"
-          value={linkUrl}
-          onChange={(event) => {
-            setLinkUrl(event.target.value);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              if (lastSelection !== null) {
-                if (linkUrl !== "") {
-                  editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
-                }
-                setEditMode(false);
-              }
-            } else if (event.key === "Escape") {
-              event.preventDefault();
-              setEditMode(false);
-            }
-          }}
-        />)
-        : (
-          <>
-            <div className="link-input">
-              <a href={linkUrl} target="_blank" rel="noopener noreferrer">
-                {linkUrl}
-              </a>
-              <div
-                className="link-edit"
-                role="button"
-                tabIndex={0}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => {
-                  setEditMode(true);
-                }}
-              />
-            </div>
-          </>
-        )}
-    </div>
-  );
-}
-
 function Select({ onChange, className, options, value }: { onChange: any, className: any, options: any, value: any }) {
   return (
     <select className={className} onChange={onChange} value={value}>
@@ -196,7 +59,7 @@ function Select({ onChange, className, options, value }: { onChange: any, classN
   );
 }
 
-function getSelectedNode(selection: any) {
+export function getSelectedNode(selection: any) {
   const anchor = selection.anchor;
   const focus = selection.focus;
   const anchorNode = selection.anchor.getNode();
@@ -398,6 +261,11 @@ export function ToolbarPlugin(props: Props) {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   //const [isStrikethrough, setIsStrikethrough] = useState(false);
+  const [linkUrl, setLinkUrl] = useState<string>("https://");
+  const [targetAttribute, setTargetAttribute] = useState<string>("_blank");
+  const [classNamesList, setClassNamesList] = useState<Array<string>>([
+    "primary",
+  ]);
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -429,7 +297,7 @@ export function ToolbarPlugin(props: Props) {
       // Update links
       const node = getSelectedNode(selection);
       const parent = node.getParent();
-      if ($isLinkNode(parent) || $isLinkNode(node)) {
+      if ($isCustomLinkNode(parent) || $isCustomLinkNode(node)) {
         setIsLink(true);
       } else {
         setIsLink(false);
@@ -470,11 +338,11 @@ export function ToolbarPlugin(props: Props) {
   );
 
   const insertLink = useCallback(() => {
-    if (!isLink) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, "https://");
-    } else {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-    }
+    editor.dispatchCommand(TOGGLE_CUSTOM_LINK_NODE_COMMAND, {
+      url: linkUrl,
+      classNames: classNamesList,
+      target: targetAttribute,
+    });
   }, [editor, isLink]);
 
   return (
@@ -523,7 +391,7 @@ export function ToolbarPlugin(props: Props) {
           <button onClick={insertLink} className={"toolbar-item spaced " + (isLink ? "active" : "")} aria-label="Insert Link">
             <i className="format link" />
           </button>
-          {isLink && createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
+          {isLink && createPortal(<FloatingLinkEditor linkUrl={linkUrl} setLinkUrl={setLinkUrl} classNamesList={classNamesList} setClassNamesList={setClassNamesList} targetAttribute={targetAttribute} setTargetAttribute={setTargetAttribute} />, document.body)}
         </>)}
       <Divider />
       <button onClick={() => { props.goFullScreen() }} className="toolbar-item spaced" aria-label="Full Screen">

@@ -18,6 +18,8 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { theme } from "./theme";
 import { ToolbarPlugin, CustomAutoLinkPlugin, ListMaxIndentLevelPlugin, PLAYGROUND_TRANSFORMERS, ReadOnlyPlugin, ControlledEditorPlugin } from "./plugins";
 import { MarkdownModal } from "./MarkdownModal";
+import CustomLinkNodePlugin from "./plugins/customLink/CustomLinkNodePlugin";
+import { CustomLinkNode } from "./plugins/customLink/CustomLinkNode";
 
 interface Props {
   value: string;
@@ -57,6 +59,7 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
       TableCellNode,
       TableRowNode,
       AutoLinkNode,
+      CustomLinkNode,
       LinkNode
     ]
   };
@@ -102,6 +105,7 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
             <ListPlugin />
             <LinkPlugin />
             <CustomAutoLinkPlugin />
+            <CustomLinkNodePlugin />
             <ListMaxIndentLevelPlugin maxDepth={7} />
             <ReadOnlyPlugin isDisabled={mode === "preview"} />
             <ControlledEditorPlugin value={value} isPreview={mode === "preview"} />
