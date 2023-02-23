@@ -262,7 +262,7 @@ export function ToolbarPlugin(props: Props) {
   const [isUnderline, setIsUnderline] = useState(false);
   //const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [linkUrl, setLinkUrl] = useState<string>("https://");
-  const [targetAttribute, setTargetAttribute] = useState<string>("_blank");
+  const [targetAttribute, setTargetAttribute] = useState<string>("_self");
   const [classNamesList, setClassNamesList] = useState<Array<string>>([
     "primary",
   ]);

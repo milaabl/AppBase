@@ -20,7 +20,7 @@ import {
 import { TOGGLE_CUSTOM_LINK_NODE_COMMAND } from "./CustomLinkNode";
 import { FloatingLinkEditorProps } from "./FloatingLinkEditor.types";
 import { getSelectedNode } from "../ToolbarPlugin";
-import { FormControl, InputLabel, Select, MenuItem, ListSubheader } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, ListSubheader, TextField, Button } from "@mui/material";
 
 const positionEditorElement = (editor: HTMLElement, rect: DOMRect | null) => {
   if (rect === null) {
@@ -156,73 +156,64 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
     });
   }, []);
 
+  const variants = ["Primary", "Secondary", "Success", "Danger", "Warning", "Info", "Light", "Dark"];
+  let appearance = "link";
+  if (classNamesList[0].indexOf("btn")>-1) appearance="btn";
+  if (classNamesList[0].indexOf("btn-block")>-1) appearance="btn btn-block";
+
+  console.log(appearance, classNamesList);
+
+  const handleSave = () => {
+    editor.dispatchCommand(TOGGLE_CUSTOM_LINK_NODE_COMMAND, {
+      url: linkUrl,
+      classNames: classNamesList,
+      target: targetAttribute,
+    });
+
+    const mainEl = document.querySelector("div[contenteditable]") as HTMLDivElement;
+    mainEl.click();
+  }
+
   return (
     <div ref={editorRef} className="link-editor">
-      <div className="link-settings">
-        <div className="link-input">
-          <input
-            value={linkUrl}
-            onChange={({ target }: ChangeEvent<HTMLInputElement>) => {
-              setLinkUrl(target.value);
-            }}
-          />
-        </div>
-        <div className="target-check">
-          <input
-            type="checkbox"
-            checked={targetAttribute === "_blank"}
-            onClick={() => {
-              setTargetAttribute((currentValue: string) =>
-                currentValue === "_blank" ? "_self" : "_blank"
-              );
-            }}
-          />
-          - New window
-        </div>
+      
+        <TextField label="Url" value={linkUrl} onChange={e => { setLinkUrl(e.target.value) }} fullWidth size="small" />
+        
+        <FormControl fullWidth>
+          <InputLabel>Appearance</InputLabel>
+          <Select name="classNames" fullWidth label="Appearance" size="small" value={appearance} onChange={(e) => { 
+            let className = "";
+            if (e.target.value.toString()!=="link") className = e.target.value.toString() + " btn-primary";
+            setClassNamesList([className]) 
+          }}>
+            <MenuItem value="link">Standard Link</MenuItem>
+            <MenuItem value="btn">Button</MenuItem>
+            <MenuItem value="btn btn-block">Full Width Button</MenuItem>
+          </Select>
+        </FormControl>
 
-        <div className="additional-config">
-          <div className="className-select">
-            <FormControl fullWidth>
-              <InputLabel>Appearance</InputLabel>
-              <Select name="classNames" fullWidth label="Appearance" size="small" value={classNamesList} onChange={(e) => { setClassNamesList([e.target.value.toString()]) }}>
-                <MenuItem value="">Standard Link</MenuItem>
-                <ListSubheader>Menu</ListSubheader>
-                {["primary", "secondary"].map((optionValue: string) => (
-                  <MenuItem value={"btn btn-" + optionValue}>{optionValue}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          
-            <select
-              name="classNames"
-              value={classNamesList}
-              onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                setClassNamesList([event.target.value]);
-              }}
-            >
-              {["primary", "secondary"].map((optionValue: string) => (
-                <option key={optionValue}>{optionValue}</option>
+        {appearance!=="link" &&
+          <FormControl fullWidth>
+            <InputLabel>Variant</InputLabel>
+            <Select name="classNames" fullWidth label="Variant" size="small" value={classNamesList[0]} onChange={(e) => { setClassNamesList([e.target.value.toString()]) }}>
+              {variants.map((optionValue: string) => (
+                <MenuItem value={appearance + " btn-" + optionValue.toLowerCase()}>{optionValue}</MenuItem>
               ))}
-            </select>
-          </div>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(TOGGLE_CUSTOM_LINK_NODE_COMMAND, {
-                url: linkUrl,
-                classNames: classNamesList,
-                target: targetAttribute,
-              });
+            </Select>
+          </FormControl>
+        }
 
-              const mainEl = document.querySelector(
-                "div[contenteditable]"
-              ) as HTMLDivElement;
-              mainEl.click();
+        <div className="target-check">
+          <input type="checkbox" checked={targetAttribute === "_blank"} onClick={() => {
+              setTargetAttribute((currentValue: string) => currentValue === "_blank" ? "_self" : "_blank" );
             }}
-          >
-            Save
-          </button>
-        </div>
-      </div>
+          />
+          - Open in new window
+        </div><br/>
+
+        <Button fullWidth={true} variant="contained" onClick={handleSave}>Save</Button>
+
+      
     </div>
   );
 };
