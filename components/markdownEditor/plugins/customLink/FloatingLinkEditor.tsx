@@ -63,7 +63,7 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
   >(null);
 
   const updateLinkEditor = useCallback(() => {
-    console.log("update");
+    //console.log("update");
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const node = getSelectedNode(selection);
@@ -71,14 +71,14 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
       const parent = node.getParent();
       if ($isCustomLinkNode(parent)) {
         const _url = editor.getElementByKey(parent.__key)?.getAttribute("href");
-        console.log(_url);
+        //console.log(_url);
         if (_url) {
           setLinkUrl(_url);
         }
       } else if ($isCustomLinkNode(node)) {
         const _url = editor.getElementByKey(node.__key)?.getAttribute("href");
         if (_url) {
-          console.log(_url);
+          //console.log(_url);
           setLinkUrl(_url);
         }
       }
@@ -161,9 +161,10 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
   if (classNamesList[0].indexOf("btn")>-1) appearance="btn";
   if (classNamesList[0].indexOf("btn-block")>-1) appearance="btn btn-block";
 
-  console.log(appearance, classNamesList);
+  //console.log(appearance, classNamesList);
 
   const handleSave = () => {
+    console.log("Saving!")
     editor.dispatchCommand(TOGGLE_CUSTOM_LINK_NODE_COMMAND, {
       url: linkUrl,
       classNames: classNamesList,
@@ -171,6 +172,7 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
     });
 
     const mainEl = document.querySelector("div[contenteditable]") as HTMLDivElement;
+    console.log("mainEl", mainEl)
     mainEl.click();
   }
 

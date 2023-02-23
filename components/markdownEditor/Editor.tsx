@@ -99,12 +99,13 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
               ErrorBoundary={LexicalErrorBoundary}
 
             />
+            <CustomLinkNodePlugin />
             <OnChangePlugin onChange={handleChange} />
             {mode !== "preview" && <AutoFocusPlugin />}
             <HistoryPlugin />
             <ListPlugin />
             <CustomAutoLinkPlugin />
-            <CustomLinkNodePlugin />
+            
             <ListMaxIndentLevelPlugin maxDepth={7} />
             <ReadOnlyPlugin isDisabled={mode === "preview"} />
             <ControlledEditorPlugin value={value} isPreview={mode === "preview"} />
