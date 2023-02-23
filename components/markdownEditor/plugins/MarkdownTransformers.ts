@@ -4,13 +4,15 @@ import type { LexicalNode, TextFormatType } from "lexical";
 import {
   ELEMENT_TRANSFORMERS,
   TEXT_FORMAT_TRANSFORMERS,
-  TEXT_MATCH_TRANSFORMERS
+  TEXT_MATCH_TRANSFORMERS,
+  TRANSFORMERS,
 } from "@lexical/markdown";
 import {
   $createHorizontalRuleNode,
   $isHorizontalRuleNode,
   HorizontalRuleNode
 } from "@lexical/react/LexicalHorizontalRuleNode";
+import { CUSTOM_LINK_NODE_TRANSFORMER } from "./customLink/CustomLinkNodeTransformer";
 
 export const HR: ElementTransformer = {
   dependencies: [HorizontalRuleNode],
@@ -90,11 +92,11 @@ export const UNDERLINE: TextMatchTransformer = {
 };
 */
 export const PLAYGROUND_TRANSFORMERS: Array<Transformer> = [
-
+  ...TRANSFORMERS.splice(0, 13),
+  CUSTOM_LINK_NODE_TRANSFORMER,
   HR,
   ...ELEMENT_TRANSFORMERS,
   ...TEXT_FORMAT_TRANSFORMERS,
   ...TEXT_MATCH_TRANSFORMERS,
-  UNDERLINE
-
+  UNDERLINE,
 ];

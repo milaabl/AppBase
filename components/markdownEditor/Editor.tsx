@@ -103,7 +103,6 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
             {mode !== "preview" && <AutoFocusPlugin />}
             <HistoryPlugin />
             <ListPlugin />
-            <LinkPlugin />
             <CustomAutoLinkPlugin />
             <CustomLinkNodePlugin />
             <ListMaxIndentLevelPlugin maxDepth={7} />
