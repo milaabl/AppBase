@@ -9,13 +9,14 @@ import {
 
 export const CUSTOM_LINK_NODE_TRANSFORMER: TextMatchTransformer = {
   dependencies: [CustomLinkNode],
-  export: (node: LexicalNode) => {
+  export: (node: LexicalNode, _, dom) => {
+    console.log(node, _, dom);
     if (!$isCustomLinkNode(node)) {
       return null;
     }
 
-    const linkContent = `[${node.getTextContent()}](${node.getURL()}){:target="${node.getTarget()}" ${node
-      .getClassNames()
+    const linkContent = `[${node.getTextContent()}](${node.__url}){:target="${node.__target}" ${node
+      .__classNames
       .map((className: string) => "." + className)
       .join(" ")}}`;
 

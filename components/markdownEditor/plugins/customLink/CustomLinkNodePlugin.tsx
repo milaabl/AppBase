@@ -17,7 +17,7 @@ const CustomLinkNodePlugin: FC = () => {
       (props: LinkCustomizationAttributes) => {
         toggleCustomLinkNode({
           ...props,
-          getNodeByKey: (key: string) => editor.getElementByKey(key),
+          getNodeByKey: (key: string) => editor.getElementByKey(key)
         });
 
         return true;
