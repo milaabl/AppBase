@@ -8,6 +8,7 @@ import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import { LexicalNode } from "lexical";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { TRANSFORMERS, $convertToMarkdownString, $convertFromMarkdownString } from "@lexical/markdown";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
@@ -59,8 +60,14 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
       TableCellNode,
       TableRowNode,
       AutoLinkNode,
+      LinkNode,
       CustomLinkNode,
-      LinkNode
+      {
+        replace: LinkNode,
+        with: (node: LexicalNode) => {
+          return new CustomLinkNode(node.__url, node.__target, []);
+        },
+      },
     ]
   };
 
@@ -105,7 +112,7 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
             <HistoryPlugin />
             <ListPlugin />
             <CustomAutoLinkPlugin />
-            
+
             <ListMaxIndentLevelPlugin maxDepth={7} />
             <ReadOnlyPlugin isDisabled={mode === "preview"} />
             <ControlledEditorPlugin value={value} isPreview={mode === "preview"} />

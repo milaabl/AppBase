@@ -4,9 +4,12 @@ import {
   LexicalCommand,
   $isElementNode,
   $getSelection,
+  EditorConfig,
   $setSelection,
   ElementNode,
   NodeKey,
+  $applyNodeReplacement,
+  $isRangeSelection
 } from "lexical";
 import { LinkNode } from "@lexical/link";
 import utils from "@lexical/utils";
@@ -18,32 +21,29 @@ export interface LinkCustomizationAttributes {
 }
 
 export class CustomLinkNode extends LinkNode {
+  __url: string;
+  __target: string;
+  __classNames: Array<string>;
   constructor(
     url: string,
     target: string,
     classNames: Array<string>,
     key?: NodeKey
   ) {
-    super(url, { target });
-    this.__url = url;
-    this.__target = target;
-    this.__classNames = classNames;
+    super(url, { target }, key);
+    this.__url = url || 'https://';
+    this.__target = target || '_self';
+    this.__classNames = classNames || [];
   }
 
-  static getType() {
-    return "custom";
+  static getType() : string {
+    return 'customlinknode';
   }
 
-  getKey(): string {
-    return this.__key;
-  }
+  static clone(node : CustomLinkNode) : CustomLinkNode {
+    const newLinkNode = new CustomLinkNode(node.__url, node.__target, node.__classNames, node.__key);
 
-  getTarget(): string {
-    return this.__target || "_blank";
-  }
-
-  getClassNames(): Array<string> {
-    return this.__classNames;
+    return $applyNodeReplacement(newLinkNode);
   }
 
   createDOM() {
@@ -57,8 +57,15 @@ export class CustomLinkNode extends LinkNode {
 
     return link;
   }
-  updateDOM() {
+
+  updateDOM(): boolean {
     return false;
+  }
+
+  setClassNames(classNames : Array<string>) : void {
+    const writable = this.getWritable();
+
+    writable.__classNames = classNames;
   }
 }
 
@@ -70,7 +77,7 @@ export function $createCustomLinkNode(
   target: string,
   classNames: Array<string>
 ): CustomLinkNode {
-  return new CustomLinkNode(url, target, classNames);
+  return $applyNodeReplacement(new CustomLinkNode(url, target, classNames));
 }
 
 export function $isCustomLinkNode(
@@ -79,130 +86,144 @@ export function $isCustomLinkNode(
   return node instanceof LinkNode;
 }
 
-export function toggleCustomLinkNode({
-  url,
-  target = "_blank",
-  classNames = [],
-  getNodeByKey,
-}: LinkCustomizationAttributes & {
-  getNodeByKey: (key: NodeKey) => HTMLElement | null;
-}): void {
+export const toggleCustomLinkNode = (
+  {
+    url,
+    target = "_blank",
+    classNames = [],
+    getNodeByKey,
+  } : LinkCustomizationAttributes & {
+    getNodeByKey: (key: NodeKey) => HTMLElement | null;
+  }): void => {
+    const addAttributesToLinkNode = (linkNode: CustomLinkNode, { url, target, classNames}: LinkCustomizationAttributes) => {
+      const dom = getNodeByKey(linkNode.getKey());
+
+      if (!dom) return;
+
+      const uniqueClassNames = classNames[0].split(' ');
+
+      linkNode.setURL(url);
+      linkNode.setTarget(target);
+
+      linkNode.setClassNames(uniqueClassNames);
+
+      dom.setAttribute("href", url);
+      dom.setAttribute("target", target);
+
+      dom.setAttribute('class', uniqueClassNames.join(' '));
+    };
+
   const selection = $getSelection();
 
-  if (selection !== null) {
-    $setSelection(selection);
+  if (!$isRangeSelection(selection)) {
+    return;
   }
 
-  const sel = $getSelection();
+  const nodes = selection.extract();
 
-  const addAttributesToLinkNode = (linkNode: CustomLinkNode) => {
-    const dom = getNodeByKey(linkNode.getKey());
+  if (url === null) {
+    // Remove LinkNodes
+    nodes.forEach((node) => {
+      const parent = node.getParent();
 
-    if (!dom) return;
+      if ($isCustomLinkNode(parent)) {
+        const children = parent.getChildren();
 
-    dom.setAttribute("href", url);
-    dom.setAttribute("target", target);
+        for (let i = 0; i < children.length; i++) {
+          parent.insertBefore(children[i]);
+        }
 
-    utils.addClassNamesToElement(dom, classNames.join(" "));
-  };
+        parent.remove();
+      }
+    });
+  } else {
+    // Add or merge LinkNodes
+    if (nodes.length === 1) {
+      const firstNode = nodes[0];
+      // if the first node is a LinkNode or if its
+      // parent is a LinkNode, we update the URL, target and rel.
+      const linkNode = $isCustomLinkNode(firstNode)
+        ? firstNode
+        : $getLinkAncestor(firstNode);
+      if (linkNode !== null && $isCustomLinkNode(linkNode)) {
+        addAttributesToLinkNode(linkNode, {url, target, classNames});
+        return;
+      }
+    }
 
-  if (sel !== null) {
-    const nodes = sel.extract();
+    let prevParent: ElementNode | LinkNode | null = null;
+    let linkNode: LinkNode | null = null;
 
-    if (url === null) {
-      nodes.forEach((node) => {
-        const parent = node.getParent();
+    nodes.forEach((node) => {
+      const parent = node.getParent();
+
+      if (
+        parent === linkNode ||
+        parent === null ||
+        ($isElementNode(node) && !node.isInline())
+      ) {
+        return;
+      }
+
+      if ($isCustomLinkNode(parent)) {
+        linkNode = parent;
+
+        addAttributesToLinkNode(parent, {url, target, classNames});
+
+        return;
+      }
+
+      if (!parent.is(prevParent)) {
+        prevParent = parent;
+        linkNode = $createCustomLinkNode(url, target, classNames);
 
         if ($isCustomLinkNode(parent)) {
-          const children = parent.getChildren();
-
-          for (let i = 0; i < children.length; i++) {
-            parent.insertBefore(children[i]);
+          if (node.getPreviousSibling() === null) {
+            parent.insertBefore(linkNode);
+          } else {
+            parent.insertAfter(linkNode);
           }
-
-          addAttributesToLinkNode(parent);
-
-          parent.remove();
-        }
-      });
-    } else {
-      if (nodes.length === 1) {
-        const firstNode = nodes[0];
-
-        if ($isCustomLinkNode(firstNode)) {
-          firstNode.setURL(url);
-          return;
         } else {
-          const parent = firstNode.getParent();
-
-          if ($isCustomLinkNode(parent)) {
-            addAttributesToLinkNode(parent);
-            return;
-          }
+          node.insertBefore(linkNode);
         }
       }
 
-      let prevParent: ElementNode | null = null;
-      let linkNode: CustomLinkNode | null = null;
-
-      nodes.forEach((node) => {
-        const parent = node.getParent();
-
-        if (
-          parent === linkNode ||
-          parent === null ||
-          ($isElementNode(node) && !node.isInline())
-        ) {
+      if ($isCustomLinkNode(node)) {
+        if (node.is(linkNode)) {
           return;
         }
-
-        if ($isCustomLinkNode(parent)) {
-          linkNode = parent;
-          addAttributesToLinkNode(linkNode);
-          return;
-        }
-
-        if (!parent.is(prevParent)) {
-          prevParent = parent;
-          linkNode = $createCustomLinkNode(url, target, classNames);
-
-          if (!linkNode) return;
-
-          if ($isCustomLinkNode(parent)) {
-            if (node.getPreviousSibling() === null) {
-              parent.insertBefore(linkNode);
-            } else {
-              parent.insertAfter(linkNode);
-            }
-          } else {
-            node.insertBefore(linkNode);
-          }
-        }
-
-        if (!linkNode) return;
-
-        addAttributesToLinkNode(linkNode);
-
-        if ($isCustomLinkNode(node)) {
-          if (node.is(linkNode)) {
-            return;
-          }
-          if (linkNode !== null) {
-            const children = node.getChildren();
-
-            for (let i = 0; i < children.length; i++) {
-              linkNode.append(children[i]);
-            }
-          }
-
-          node.remove();
-          return;
-        }
-
         if (linkNode !== null) {
-          linkNode.append(node);
+          const children = node.getChildren();
+
+          for (let i = 0; i < children.length; i++) {
+            linkNode.append(children[i]);
+          }
         }
-      });
-    }
+
+        node.remove();
+        return;
+      }
+
+      if (linkNode !== null) {
+        linkNode.append(node);
+      }
+    });
   }
+}
+
+const $getLinkAncestor = (node: LexicalNode): null | LexicalNode => {
+  return $getAncestor(node, (ancestor) => $isCustomLinkNode(ancestor));
+}
+
+const $getAncestor = (
+  node: LexicalNode,
+  predicate: (ancestor: LexicalNode) => boolean,
+): null | LexicalNode => {
+  let parent: null | LexicalNode = node;
+  while (
+    parent !== null &&
+    (parent = parent.getParent()) !== null &&
+    !predicate(parent)
+  );
+  return parent;
 }

@@ -7,4 +7,5 @@ export interface FloatingLinkEditorProps {
   setTargetAttribute: Dispatch<SetStateAction<string>>;
   classNamesList: Array<string>;
   setClassNamesList: (value: Array<string>) => void;
+  selectedElementKey: string | null;
 }

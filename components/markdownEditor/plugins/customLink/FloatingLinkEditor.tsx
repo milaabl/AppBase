@@ -16,6 +16,8 @@ import {
   RangeSelection,
   GridSelection,
   NodeSelection,
+  $setSelection,
+  $getNodeByKey
 } from "lexical";
 import { TOGGLE_CUSTOM_LINK_NODE_COMMAND } from "./CustomLinkNode";
 import { FloatingLinkEditorProps } from "./FloatingLinkEditor.types";
@@ -51,6 +53,7 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
   setClassNamesList,
   targetAttribute,
   setTargetAttribute,
+  selectedElementKey
 }) => {
   const [editor] = useLexicalComposerContext();
 
@@ -63,7 +66,6 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
   >(null);
 
   const updateLinkEditor = useCallback(() => {
-    //console.log("update");
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const node = getSelectedNode(selection);
@@ -71,14 +73,12 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
       const parent = node.getParent();
       if ($isCustomLinkNode(parent)) {
         const _url = editor.getElementByKey(parent.__key)?.getAttribute("href");
-        //console.log(_url);
         if (_url) {
           setLinkUrl(_url);
         }
       } else if ($isCustomLinkNode(node)) {
         const _url = editor.getElementByKey(node.__key)?.getAttribute("href");
         if (_url) {
-          //console.log(_url);
           setLinkUrl(_url);
         }
       }
@@ -136,7 +136,9 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          updateLinkEditor();
+          editor.getEditorState().read(() => {
+            updateLinkEditor();
+          });
           return true;
         },
         LowPriority
@@ -161,32 +163,34 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
   if (classNamesList[0].indexOf("btn")>-1) appearance="btn";
   if (classNamesList[0].indexOf("btn-block")>-1) appearance="btn btn-block";
 
-  //console.log(appearance, classNamesList);
-
   const handleSave = () => {
-    console.log("Saving!")
+    console.log("Saving!");
     editor.dispatchCommand(TOGGLE_CUSTOM_LINK_NODE_COMMAND, {
       url: linkUrl,
       classNames: classNamesList,
       target: targetAttribute,
     });
 
-    const mainEl = document.querySelector("div[contenteditable]") as HTMLDivElement;
-    console.log("mainEl", mainEl)
-    mainEl.click();
+    editor.update(() => {
+      if (!selectedElementKey) return;
+
+      const selectedNode = $getNodeByKey(selectedElementKey);
+
+      selectedNode?.selectEnd();
+    });
   }
 
   return (
     <div ref={editorRef} className="link-editor">
-      
+
         <TextField label="Url" value={linkUrl} onChange={e => { setLinkUrl(e.target.value) }} fullWidth size="small" />
-        
+
         <FormControl fullWidth>
           <InputLabel>Appearance</InputLabel>
-          <Select name="classNames" fullWidth label="Appearance" size="small" value={appearance} onChange={(e) => { 
+          <Select name="classNames" fullWidth label="Appearance" size="small" value={appearance} onChange={(e) => {
             let className = "";
             if (e.target.value.toString()!=="link") className = e.target.value.toString() + " btn-primary";
-            setClassNamesList([className]) 
+            setClassNamesList([className])
           }}>
             <MenuItem value="link">Standard Link</MenuItem>
             <MenuItem value="btn">Button</MenuItem>
@@ -215,7 +219,7 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
 
         <Button fullWidth={true} variant="contained" onClick={handleSave}>Save</Button>
 
-      
+
     </div>
   );
 };

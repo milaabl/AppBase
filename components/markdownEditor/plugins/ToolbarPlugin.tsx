@@ -337,6 +337,8 @@ export function ToolbarPlugin(props: Props) {
     [editor, selectedElementKey]
   );
 
+  useEffect(() => console.log(linkUrl), [linkUrl]);
+
   const insertLink = useCallback(() => {
     editor.dispatchCommand(TOGGLE_CUSTOM_LINK_NODE_COMMAND, {
       url: linkUrl,
@@ -391,7 +393,7 @@ export function ToolbarPlugin(props: Props) {
           <button onClick={insertLink} className={"toolbar-item spaced " + (isLink ? "active" : "")} aria-label="Insert Link">
             <i className="format link" />
           </button>
-          {isLink && createPortal(<FloatingLinkEditor linkUrl={linkUrl} setLinkUrl={setLinkUrl} classNamesList={classNamesList} setClassNamesList={setClassNamesList} targetAttribute={targetAttribute} setTargetAttribute={setTargetAttribute} />, document.body)}
+          {isLink && createPortal(<FloatingLinkEditor selectedElementKey={selectedElementKey} linkUrl={linkUrl} setLinkUrl={setLinkUrl} classNamesList={classNamesList} setClassNamesList={setClassNamesList} targetAttribute={targetAttribute} setTargetAttribute={setTargetAttribute} />, document.body)}
         </>)}
       <Divider />
       <button onClick={() => { props.goFullScreen() }} className="toolbar-item spaced" aria-label="Full Screen">
