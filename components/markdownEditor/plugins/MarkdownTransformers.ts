@@ -91,12 +91,12 @@ export const UNDERLINE: TextMatchTransformer = {
   type: 'text-match',
 };
 */
+
 export const PLAYGROUND_TRANSFORMERS: Array<Transformer> = [
-  ...TRANSFORMERS.splice(0, 13),
+  ...TEXT_FORMAT_TRANSFORMERS,
   HR,
   ...ELEMENT_TRANSFORMERS,
-  ...TEXT_FORMAT_TRANSFORMERS,
-  ...TEXT_MATCH_TRANSFORMERS,
   UNDERLINE,
-  CUSTOM_LINK_NODE_TRANSFORMER
+  ...TRANSFORMERS.splice(0, 13),
+  CUSTOM_LINK_NODE_TRANSFORMER,
 ];
