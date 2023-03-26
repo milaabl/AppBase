@@ -206,6 +206,8 @@
   margin: 0;
   margin-bottom: 8px;
   position: relative;
+  display: flex;
+  align-items: flex-end;
 }
 
 .editor-paragraph:last-child {

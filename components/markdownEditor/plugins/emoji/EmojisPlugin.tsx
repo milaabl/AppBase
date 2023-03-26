@@ -7,68 +7,56 @@
  */
 
 import type {LexicalEditor} from 'lexical';
-
+import 'material-symbols';
+import { $convertFromMarkdownString } from "@lexical/markdown";
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {TextNode} from 'lexical';
+import {$createTextNode, TextNode} from 'lexical';
 import {useEffect} from 'react';
+import { materialIcons } from './emoji-list';
 
 import {$createEmojiNode, EmojiNode} from './EmojiNode';
+import { EMOJI_NODE_MARKDOWN_REGEX } from './EmojiNodeTransform';
 
-const emojis: Map<string, [string, string]> = new Map([
-  [':)', ['emoji happysmile', '🙂']],
-  [':D', ['emoji veryhappysmile', '😀']],
-  [':(', ['emoji unhappysmile', '🙁']],
-  ['<3', ['emoji heart', '❤']],
-  ['🙂', ['emoji happysmile', '🙂']],
-  ['😀', ['emoji veryhappysmile', '😀']],
-  ['🙁', ['emoji unhappysmile', '🙁']],
-  ['❤', ['emoji heart', '❤']],
-]);
-
-function findAndTransformEmoji(node: TextNode): null | TextNode {
-  const text = node.getTextContent();
-
-  for (let i = 0; i < text.length; i++) {
-    const emojiData = emojis.get(text[i]) || emojis.get(text.slice(i, i + 2));
-
-    if (emojiData !== undefined) {
-      const [emojiStyle, emojiText] = emojiData;
-      let targetNode;
-
-      if (i === 0) {
-        [targetNode] = node.splitText(i + 2);
-      } else {
-        [, targetNode] = node.splitText(i, i + 2);
-      }
-
-      const emojiNode = $createEmojiNode(emojiStyle, emojiText);
-      targetNode.replace(emojiNode);
-      return emojiNode;
-    }
-  }
-
-  return null;
-}
-
-function textNodeTransform(node: TextNode): void {
-  let targetNode: TextNode | null = node;
-
-  while (targetNode !== null) {
-    if (!targetNode.isSimpleText()) {
-      return;
-    }
-
-    targetNode = findAndTransformEmoji(targetNode);
-  }
-}
 
 function useEmojis(editor: LexicalEditor): void {
   useEffect(() => {
-    if (!editor.hasNodes([EmojiNode])) {
-      throw new Error('EmojisPlugin: EmojiNode not registered on editor');
-    }
+      if (!editor.hasNodes([EmojiNode, TextNode])) {
+        throw new Error('EmojisPlugin: EmojiNode not registered on editor');
+      }
 
-    return editor.registerNodeTransform(TextNode, textNodeTransform);
+      return editor.registerNodeTransform(TextNode, (textNode) => {
+
+        if (EMOJI_NODE_MARKDOWN_REGEX.test(textNode.getTextContent()) || materialIcons.map((materialIcon : string) => ':' + materialIcon + ':').some((materialIcon : string) => textNode.getTextContent().includes(materialIcon))) {
+
+          const materialIconToInsert = materialIcons.find((materialIcon : string) => textNode.getTextContent().replaceAll(':', '').includes(materialIcon));
+
+          if (!materialIconToInsert) return;
+
+          const initialTextInput = textNode.getTextContent();
+          const emojiNode = $createEmojiNode('material-symbols-outlined', materialIconToInsert);
+
+          const leftoverTextNodes : Array<TextNode> = [];
+
+          initialTextInput.split(':').forEach((leftoverTextString : string, index : number) => {
+            if (materialIcons.includes(leftoverTextString)) {
+              const emojiNode = $createEmojiNode('material-symbols-outlined', leftoverTextString);
+
+              leftoverTextNodes.push(emojiNode);
+              return;
+            }
+            leftoverTextNodes.push($createTextNode(leftoverTextString));
+          });
+
+          textNode.setTextContent('');
+
+
+          textNode.getParent().splice(textNode.getIndexWithinParent(), 1, leftoverTextNodes);
+
+          leftoverTextNodes.find((node : TextNode) => materialIcons.includes(node.__text)).select();
+
+          textNode.remove();
+        }
+    });
   }, [editor]);
 }
 

@@ -22,24 +22,7 @@ import * as React from 'react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import * as ReactDOM from 'react-dom';
 
-class EmojiOption extends TypeaheadOption {
-  title: string;
-  emoji: string;
-  keywords: Array<string>;
-
-  constructor(
-    title: string,
-    emoji: string,
-    options: {
-      keywords?: Array<string>;
-    },
-  ) {
-    super(title);
-    this.title = title;
-    this.emoji = emoji;
-    this.keywords = options.keywords || [];
-  }
-}
+/*
 function EmojiMenuItem({
   index,
   isSelected,
@@ -87,29 +70,17 @@ type Emoji = {
 };
 
 const MAX_EMOJI_SUGGESTION_COUNT = 10;
-
+*/
 export default function EmojiPickerPlugin() {
-  const [editor] = useLexicalComposerContext();
+/*  const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
-  const [emojis, setEmojis] = useState<Array<Emoji>>([]);
+  const [emojis, setEmojis] = useState<Array<string>>([]);
 
   useEffect(() => {
     // @ts-ignore
     import('./emoji-list.ts').then((file) => setEmojis(file.default));
   }, []);
 
-  const emojiOptions = useMemo(
-    () =>
-      emojis != null
-        ? emojis.map(
-            ({emoji, aliases, tags}) =>
-              new EmojiOption(aliases[0], emoji, {
-                keywords: [...aliases, ...tags],
-              }),
-          )
-        : [],
-    [emojis],
-  );
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch(':', {
     minLength: 0,
@@ -125,10 +96,10 @@ export default function EmojiPickerPlugin() {
                 new RegExp(queryString, 'gi').exec(keyword),
               )
             : false
-          : emojiOptions;
+          : emojis;
       })
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
-  }, [emojiOptions, queryString]);
+  }, [emojis, queryString]);
 
   const onSelectOption = useCallback(
     (
@@ -200,5 +171,7 @@ export default function EmojiPickerPlugin() {
           : null;
       }}
     />
-  );
+  );*/
+
+  return null;
 }

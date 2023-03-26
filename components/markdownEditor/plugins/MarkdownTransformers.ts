@@ -12,6 +12,8 @@ import {
   HorizontalRuleNode
 } from "@lexical/react/LexicalHorizontalRuleNode";
 import { CUSTOM_LINK_NODE_TRANSFORMER } from "./customLink/CustomLinkNodeTransformer";
+import { EMOJI_NODE_MARKDOWN_TRANSFORM } from "./emoji/EmojiNodeTransform";
+
 
 export const HR: ElementTransformer = {
   dependencies: [HorizontalRuleNode],
@@ -91,15 +93,14 @@ export const UNDERLINE: TextMatchTransformer = {
 };
 */
 
-const modifiedTextTransformers = [...TEXT_FORMAT_TRANSFORMERS];
-modifiedTextTransformers.splice(6,1)
+const modifiedTextTransformers = [EMOJI_NODE_MARKDOWN_TRANSFORM];
 
 export const PLAYGROUND_TRANSFORMERS: Array<Transformer> = [
   UNDERLINE,
   ...modifiedTextTransformers,
   HR,
   ...ELEMENT_TRANSFORMERS,
-  
+
   ...TRANSFORMERS.splice(0, 13),
   CUSTOM_LINK_NODE_TRANSFORMER
 ];
