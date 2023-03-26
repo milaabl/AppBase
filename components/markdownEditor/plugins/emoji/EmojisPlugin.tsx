@@ -52,7 +52,7 @@ function useEmojis(editor: LexicalEditor): void {
 
           textNode.getParent().splice(textNode.getIndexWithinParent(), 1, leftoverTextNodes);
 
-          leftoverTextNodes.find((node : TextNode) => materialIcons.includes(node.__text)).select();
+          (leftoverTextNodes.find((node : TextNode) => materialIcons.includes(node.__text)) || leftoverTextNodes[leftoverTextNodes.length - 1]).select();
 
           textNode.remove();
         }
