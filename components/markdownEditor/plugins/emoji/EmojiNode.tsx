@@ -18,32 +18,43 @@ import {$applyNodeReplacement, TextNode} from 'lexical';
 
 export type SerializedEmojiNode = Spread<
   {
-    className: string;
-    type: 'emoji';
+    type: string;
   },
   SerializedTextNode
 >;
 
 export class EmojiNode extends TextNode {
-  __className: string;
+  exportJSON() : SerializedEmojiNode {
+    const json = {
+      ...super.exportJSON(),
+      type: 'emoji'
+   };
+   return json;
+ }
 
-  static getType(): string {
-    return 'emoji';
+static getType(): string {
+  return 'emoji';
+}
+
+static clone(node: EmojiNode): EmojiNode {
+  return new EmojiNode(node.__text, node.__key);
+}
+
+ static importJSON(serializedNode: SerializedEmojiNode): EmojiNode {
+    const node = new EmojiNode(serializedNode.text);
+    return node;
   }
 
-  static clone(node: EmojiNode): EmojiNode {
-    return new EmojiNode(node.__className, node.__text, node.__key);
-  }
 
-  constructor(className: string, text: string, key?: NodeKey) {
+  constructor(text: string, key?: NodeKey) {
     super(text, key);
-    this.__className = className;
   }
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = document.createElement('span');
     const inner = super.createDOM(config);
-    dom.className = this.__className;
+    dom.className = 'material-symbols-outlined';
+    console.log(inner, dom);
     dom.appendChild(inner);
     return dom;
   }
@@ -69,18 +80,16 @@ export function $isEmojiNode(
 }
 
 export function $createEmojiNode(
-  className: string,
-  emojiText: string,
+  emojiText: string
 ): EmojiNode {
-  const node = new EmojiNode(className, emojiText).setMode('token');
+  const node = new EmojiNode(emojiText).setMode('token');
   return $applyNodeReplacement(node);
 }
 
 
 export function $toggleEmojiNode(
-  className: string,
   emojiText: string,
 ): EmojiNode {
-  const node = new EmojiNode(className, emojiText).setMode('token');
+  const node = new EmojiNode(emojiText).setMode('token');
   return node;
 }

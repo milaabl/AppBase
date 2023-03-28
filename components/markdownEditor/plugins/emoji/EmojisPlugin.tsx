@@ -25,7 +25,6 @@ function useEmojis(editor: LexicalEditor): void {
       }
 
       return editor.registerNodeTransform(TextNode, (textNode) => {
-
         if (EMOJI_NODE_MARKDOWN_REGEX.test(textNode.getTextContent()) || materialIcons.map((materialIcon : string) => ':' + materialIcon + ':').some((materialIcon : string) => textNode.getTextContent().includes(materialIcon))) {
 
           const materialIconToInsert = materialIcons.find((materialIcon : string) => textNode.getTextContent().replaceAll(':', '').includes(materialIcon));
@@ -33,13 +32,13 @@ function useEmojis(editor: LexicalEditor): void {
           if (!materialIconToInsert) return;
 
           const initialTextInput = textNode.getTextContent();
-          const emojiNode = $createEmojiNode('material-symbols-outlined', materialIconToInsert);
+          const emojiNode = $createEmojiNode(materialIconToInsert);
 
           const leftoverTextNodes : Array<TextNode> = [];
 
           initialTextInput.split(':').forEach((leftoverTextString : string, index : number) => {
             if (materialIcons.includes(leftoverTextString)) {
-              const emojiNode = $createEmojiNode('material-symbols-outlined', leftoverTextString);
+              const emojiNode = $createEmojiNode(leftoverTextString);
 
               leftoverTextNodes.push(emojiNode);
               return;

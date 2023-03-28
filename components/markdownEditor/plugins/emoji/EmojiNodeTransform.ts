@@ -4,14 +4,14 @@ import  { materialIcons } from './emoji-list';
 import type { TextMatchTransformer } from "@lexical/markdown";
 import { TextNode, $createTextNode, $isTextNode } from "lexical";
 
-const EMOJI_NODE_MARKDOWN_REGEX_QUERY = /:[A-Za-z]+:$/;
+const EMOJI_NODE_MARKDOWN_REGEX_QUERY = /:[A-Za-z_]+:$/;
 
 export const EMOJI_NODE_MARKDOWN_REGEX = new RegExp(EMOJI_NODE_MARKDOWN_REGEX_QUERY);
 
 const replaceEmojiMarkdownWithNode = (textNode: TextNode, match) => {
   console.log(textNode.__text);
   const emojiNode = $createEmojiNode(
-    'material-symbols-outlined', textNode.__text.replaceAll(':', '')
+    textNode.__text.replaceAll(':', '')
   );
 
   textNode.replace(emojiNode);
