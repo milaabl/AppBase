@@ -54,7 +54,6 @@ static clone(node: EmojiNode): EmojiNode {
     const dom = document.createElement('span');
     const inner = super.createDOM(config);
     dom.className = 'material-symbols-outlined';
-    console.log(inner, dom);
     dom.appendChild(inner);
     return dom;
   }

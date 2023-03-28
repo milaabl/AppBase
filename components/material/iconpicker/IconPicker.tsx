@@ -108,6 +108,8 @@ type Props = {
   onSelect: (iconName: string) => void;
 };
 
+const defaultIcons = ["person", "group", "groups", "contact_mail", "mail", "church", "favorite", "volunteer_activism", "link", "home", "apps", "web", "public", "rss_feed", "videocam", "live_tv", "music_note", "menu_book", "star", "accessible", "woman", "man", "child_care", "handshake", "location_on", "restaurant", "local_cafe" ];
+
 export default function SearchIcons(props: Props) {
   const pageSize = 27;
   const [keys, setKeys] = React.useState<any[] | null>(null);
@@ -117,7 +119,7 @@ export default function SearchIcons(props: Props) {
   const updateSearchResults = React.useMemo(
     () =>
       debounce((value) => {
-        if (value === "") setKeys(null);
+        if (value === "") setKeys(defaultIcons);
         else searchIndex.searchAsync(value, { limit: 3000 }).then((results: any) => { setKeys(results); setPage(1); });
       }, UPDATE_SEARCH_INDEX_WAIT_MS),
     []
@@ -142,7 +144,9 @@ export default function SearchIcons(props: Props) {
           </IconButton>
           <Input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search icons…" inputProps={{ "aria-label": "search icons" }} />
         </Paper>
-        <Typography sx={{ mb: 1 }}>{`${icons.length} matching results`}</Typography>
+        {(query === "") && <Typography sx={{ mb: 1 }}>{`${iconNamesList.length} icons available`}</Typography>}
+        {(query !== "") && <Typography sx={{ mb: 1 }}>{`${icons.length} matching results`}</Typography>}
+        
         <Icons icons={paged(icons, page)} handleOpenClick={props.onSelect} />
       </Grid>
 

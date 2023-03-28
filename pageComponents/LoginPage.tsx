@@ -70,8 +70,9 @@ export const LoginPage: React.FC<Props> = ({ showLogo = true, loginContainerCssP
       if (props.jwt) {
         setWelcomeBackName(cookies.name);
         login({ jwt: props.jwt });
-      } else {
         setPendingAutoLogin(true);
+      } else {
+        setPendingAutoLogin(false);
       }
     }
   };
@@ -189,7 +190,7 @@ export const LoginPage: React.FC<Props> = ({ showLogo = true, loginContainerCssP
       setIsSubmitting(false);
       handleLoginSuccess(resp);
     } catch (e: any) {
-      setPendingAutoLogin(true);
+      setPendingAutoLogin(false);
       handleLoginErrors([e.toString()]);
       setIsSubmitting(false);
     }
@@ -221,7 +222,7 @@ export const LoginPage: React.FC<Props> = ({ showLogo = true, loginContainerCssP
       <ErrorMessages errors={errors} />
       {getWelcomeBack()}
       {getCheckEmail()}
-      {pendingAutoLogin && getInputBox()}
+      {!pendingAutoLogin && getInputBox()}
       <SelectChurchModal show={showSelectModal} userChurches={loginResponse?.userChurches} selectChurch={selectChurch} registeredChurchCallback={handleChurchRegistered} errors={errors} appName={props.appName} />
       <FloatingSupport appName={props.appName} />
     </Box>
