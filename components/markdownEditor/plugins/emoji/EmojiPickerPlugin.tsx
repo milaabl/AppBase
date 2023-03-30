@@ -72,11 +72,12 @@ export default function EmojiPickerPlugin() {
     minLength: 0,
   });
 
-  const options: Array<any> = useMemo(() => materialIcons
-    .filter((option: string) => queryString != null
-      ? new RegExp(queryString, 'gi').exec(option)
-      : materialIcons)
-    .slice(0, MAX_EMOJI_SUGGESTION_COUNT), [queryString]);
+  const options: Array<any> = useMemo(() => {
+    let result = materialIcons.filter((option: string) =>
+      (queryString != null) ? new RegExp(queryString, 'gi').exec(option) : materialIcons
+    );
+    return result.slice(0, MAX_EMOJI_SUGGESTION_COUNT);
+  }, [queryString]);
 
   const onSelectOption = useCallback(
     (

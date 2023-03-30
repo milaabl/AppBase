@@ -2,7 +2,7 @@ import { EmojiNode, $isEmojiNode, $createEmojiNode, $toggleEmojiNode } from './E
 import  materialIcons from '../../../material/iconPicker/IconNamesList';
 
 import type { TextMatchTransformer } from "@lexical/markdown";
-import { TextNode, $createTextNode, $isTextNode } from "lexical";
+import { TextNode, $isTextNode } from "lexical";
 
 const EMOJI_NODE_MARKDOWN_REGEX_QUERY = /:[A-Za-z_]+:$/;
 

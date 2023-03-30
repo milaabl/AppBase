@@ -184,8 +184,8 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
         </Select>
       </FormControl>
 
-      {appearance!=="link" && 
-      <div>
+      {appearance!=="link"
+      && <div>
         <FormControl fullWidth>
           <InputLabel>Variant</InputLabel>
           <Select name="classNames" fullWidth label="Variant" size="small" value={ classNamesList[1] } onChange={(e) => {
@@ -193,14 +193,14 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
             let index = 0;
             newArray.forEach((item, i) => {
               variants.forEach((element) => {
-                if (item.includes(element.toLowerCase())) {   
+                if (item.includes(element.toLowerCase())) {
                   index = i;
                 };
               })
             })
             newArray.splice(index, 1, e.target.value.toString());
             setClassNamesList(newArray);
-            }}>
+          }}>
             {variants.map((optionValue: string) => (
               <MenuItem key={appearance + " btn-" + optionValue.toLowerCase()} value={"btn-" + optionValue.toLowerCase()}>{optionValue}</MenuItem>
             ))}
@@ -219,8 +219,8 @@ const FloatingLinkEditor: FC<FloatingLinkEditorProps> = ({
               })
             })
             newArray.splice(index, 1, e.target.value.toString());
-            setClassNamesList(newArray);            
-            }}>
+            setClassNamesList(newArray);
+          }}>
             {sizes.map((optionValue: string) => (
               <MenuItem key={appearance + " btn-" + optionValue.toLowerCase()} value={"btn-" + optionValue.toLowerCase()}>{optionValue}</MenuItem>
             ))}
