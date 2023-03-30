@@ -100,6 +100,6 @@ export const PLAYGROUND_TRANSFORMERS: Array<Transformer> = [
   ...modifiedTextTransformers,
   HR,
   ...ELEMENT_TRANSFORMERS,
-  CUSTOM_LINK_NODE_TRANSFORMER,
+
   ...TRANSFORMERS.splice(0, 13),
 ];

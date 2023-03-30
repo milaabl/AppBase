@@ -6,8 +6,18 @@ import {
   CustomLinkNode,
   $createCustomLinkNode
 } from "./CustomLinkNode";
+import {
+  EmojiNode,
+  $createEmojiNode
+} from "../emoji/EmojiNode";
+import {
+  EMOJI_NODE_MARKDOWN_REGEX
+} from "../emoji/EmojiNodeTransform";
 
-const CUSTOM_LINK_NODE_MARKDOWN_REGEX_QUERY = /(?:\[([^[]+)\])(?:\(([^(]+)\))(?:({([^}]*)})?)(?:(.*))$/;
+
+import iconNamesList from '../../../material/iconPicker/IconNamesList';
+
+const CUSTOM_LINK_NODE_MARKDOWN_REGEX_QUERY = /(?:\[([^[]+?)\])(?:\(([^(]+)\))(?:({([^}]*)})?)(?:((.*)\)?))$/;
 
 const CUSTOM_LINK_NODE_MARKDOWN_REGEX = new RegExp(CUSTOM_LINK_NODE_MARKDOWN_REGEX_QUERY);
 
@@ -18,6 +28,7 @@ const replaceCustomLinkNode = (textNode : TextNode, match : any) => {
     linkText = ' '.repeat(match.input.length - match.input.trim().length) + linkText;
   }
   const otherText = match[5];
+
 
   const linkNode = $createCustomLinkNode(
     linkUrl,
@@ -36,32 +47,47 @@ const replaceCustomLinkNode = (textNode : TextNode, match : any) => {
   linkNode.append(linkTextNode);
   textNode.replace(linkNode);
 
-  if (otherText) {
-    if (CUSTOM_LINK_NODE_MARKDOWN_REGEX.test(otherText)) {
-      const blankNode = $createTextNode("");
+  const emojiText = otherText.replace(CUSTOM_LINK_NODE_MARKDOWN_REGEX, '').trim();
 
-      linkNode.getParent().append(blankNode);
 
-      replaceCustomLinkNode(blankNode, otherText.match(CUSTOM_LINK_NODE_MARKDOWN_REGEX_QUERY));
 
-      return;
-    }
-    const otherTextNode = $createTextNode(otherText);
+
+
+  if (match[5]) {
+    const otherTextNode = $createTextNode(match[5].replace(CUSTOM_LINK_NODE_MARKDOWN_REGEX, ''));
 
     linkNode.getParent().append(otherTextNode);
+}
+
+
+  if (CUSTOM_LINK_NODE_MARKDOWN_REGEX.test(match[5])) {
+    const blankNode = $createTextNode("");
+
+    linkNode.getParent().append(blankNode);
+
+    replaceCustomLinkNode(blankNode, match[5].match(CUSTOM_LINK_NODE_MARKDOWN_REGEX_QUERY));
+  }
+
+  if (emojiText) {
+    if (!iconNamesList.includes(emojiText.replaceAll(':', ''))) return;
+
+    linkNode.getParent().append($createEmojiNode(emojiText.replaceAll(':', '')));
   }
 };
 
 export const CUSTOM_LINK_NODE_TRANSFORMER: TextMatchTransformer = {
-  dependencies: [CustomLinkNode],
+  dependencies: [EmojiNode, CustomLinkNode],
   export: (node, exportChildren, exportFormat) => {
     if (!$isCustomLinkNode(node)) {
       return null;
     }
-    const linkContent = `[${node.getTextContent()}](${node.__url}){:target="${node.__target}" ${node
-      .__classNames
-      .map((className: string) => "." + className)
-      .join(" ")}}`;
+
+      const linkContent = `[${node.getTextContent()}](${node.__url}){:target="${node.__target}" ${node
+        .__classNames
+        .join(' ')
+        .split(' ')
+        .map((className: string) => "." + className.replaceAll('.', ''))
+        .join(" ")}}`;
 
     const firstChild = node.getFirstChild();
 
@@ -69,6 +95,7 @@ export const CUSTOM_LINK_NODE_TRANSFORMER: TextMatchTransformer = {
       return exportFormat(firstChild, linkContent);
     } else {
       return linkContent;
+
     }
   },
   importRegExp: CUSTOM_LINK_NODE_MARKDOWN_REGEX,
