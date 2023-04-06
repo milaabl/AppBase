@@ -23,10 +23,7 @@ export default function Localhost() {
 
       <br />
       <h3>Editor</h3>
-      <MarkdownEditor value={val} onChange={(v) => {
-        console.log(v);
-        setVal(v)
-      }} />
+      <MarkdownEditor value={val} onChange={setVal} />
       <h3>Markdown</h3>
       <TextField multiline fullWidth value={val} />
       <h3>Preview</h3>
