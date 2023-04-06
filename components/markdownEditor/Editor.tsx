@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback, useMemo} from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -39,12 +39,20 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
   const handleChange = (editorState: any) => {
     editorState.read(() => {
       const markdown = $convertToMarkdownString(PLAYGROUND_TRANSFORMERS);
-      onChange(markdown)
+      onChange(markdown);
     });
   };
 
   const onError = (error: any) => {
     console.error(error);
+  };
+
+  const handleModalOnChange = (value : string) => {
+    onChange(value);
+  };
+
+  const handleCloseFullScreen = (newValue: string) => {
+    setFullScreen(false);
   };
 
   const initialConfig = {
@@ -89,27 +97,17 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
       break;
   }
 
-  const handleCloseFullScreen = (newValue: string) => {
-    onChange(newValue)
-    setFullScreen(false);
-  }
-
-  const getFullScreenModal = () => {
-    if (fullScreen) return (<MarkdownModal value={value} hideModal={handleCloseFullScreen} />);
-  }
-
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
         <div className={(mode === "preview") ? `editor-container preview ${textAlignClass}` : `editor-container ${textAlignClass}`} style={Object.assign({ border: mode === "preview" ? "none" : "1px solid lightgray" }, style)}>
           {mode !== "preview" && <ToolbarPlugin goFullScreen={() => { setFullScreen(true) }} />}
           <div className="editor-inner">
-            <RichTextPlugin
+            {!fullScreen && <RichTextPlugin
               contentEditable={<ContentEditable className="editor-input" style={{ minHeight: mode === "preview" ? "auto" : "150px" }} />}
               placeholder={mode !== "preview" ? <div className="editor-placeholder">{placeholder}</div> : null}
               ErrorBoundary={LexicalErrorBoundary}
-
-            />
+            /> }
             <CustomLinkNodePlugin />
             {mode !== "preview" && <EmojiPickerPlugin />}
             <EmojisPlugin />
@@ -121,12 +119,12 @@ export function Editor({ value, onChange = () => { }, mode = "interactive", text
 
             <ListMaxIndentLevelPlugin maxDepth={7} />
             <ReadOnlyPlugin isDisabled={mode === "preview"} />
-            <ControlledEditorPlugin value={value} isPreview={mode === "preview"} />
+            <ControlledEditorPlugin isFullscreen={fullScreen} value={value} isPreview={mode === "preview"} />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
           </div>
         </div>
       </LexicalComposer>
-      {getFullScreenModal()}
+      {fullScreen && <MarkdownModal onChange={handleModalOnChange} value={value} hideModal={handleCloseFullScreen} />}
     </>
   );
 }
